@@ -3,7 +3,8 @@
   "env": {
     "MCP_API_KEY": "REDACTED",
     "DISABLE_INTERLEAVED_THINKING": "true",
-    "DA": "Kai",
+    "DA": "SecOps AI",
+    "CORE_SKILL": "WORK",
     "PAI_DIR": "$HOME/.claude"
   },
   "permissions": {

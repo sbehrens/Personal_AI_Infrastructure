@@ -3,26 +3,27 @@
 /**
  * load-core-context.ts
  *
- * Automatically loads your PAI skill context at session start by reading and injecting
- * the PAI SKILL.md file contents directly into Claude's context as a system-reminder.
+ * Automatically loads your core identity skill context at session start by reading and injecting
+ * the skill SKILL.md file contents directly into Claude's context as a system-reminder.
  *
  * Purpose:
- * - Read PAI SKILL.md file content
+ * - Read core identity SKILL.md file content (PAI or WORK)
  * - Output content as system-reminder for Claude to process
- * - Ensure complete context (contacts, preferences, security, identity) available at session start
+ * - Ensure complete context (identity, preferences, security) available at session start
  * - Bypass skill activation logic by directly injecting context
  *
  * Setup:
- * 1. Customize your ~/.claude/skills/PAI/SKILL.md with your personal context
+ * 1. Customize your ~/.claude/skills/WORK/SKILL.md (or PAI) with your identity context
  * 2. Add this hook to settings.json SessionStart hooks
  * 3. Ensure PAI_DIR environment variable is set (defaults to $HOME/.claude)
+ * 4. Set CORE_SKILL environment variable to choose skill (defaults to WORK, falls back to PAI)
  *
  * How it works:
  * - Runs at the start of every Claude Code session
- * - Skips execution for subagent sessions (they don't need PAI context)
- * - Reads your PAI SKILL.md file
+ * - Skips execution for subagent sessions (they don't need core context)
+ * - Reads your core identity SKILL.md file
  * - Injects content as <system-reminder> which Claude processes automatically
- * - Gives your AI immediate access to your complete personal context
+ * - Gives your AI immediate access to your complete identity context
  */
 
 import { readFileSync, existsSync } from 'fs';
@@ -37,38 +38,48 @@ async function main() {
                       process.env.CLAUDE_AGENT_TYPE !== undefined;
 
     if (isSubagent) {
-      // Subagent sessions don't need PAI context loading
-      console.error('🤖 Subagent session - skipping PAI context loading');
+      // Subagent sessions don't need core context loading
+      console.error('🤖 Subagent session - skipping core context loading');
       process.exit(0);
     }
 
     // Get PAI directory from environment or use default
     const paiDir = process.env.PAI_DIR || join(homedir(), '.claude');
-    const paiSkillPath = join(paiDir, 'skills/PAI/SKILL.md');
 
-    // Verify PAI skill file exists
-    if (!existsSync(paiSkillPath)) {
-      console.error(`❌ PAI skill not found at: ${paiSkillPath}`);
-      console.error(`💡 Create your PAI skill file or check PAI_DIR environment variable`);
+    // Determine which core skill to load (WORK or PAI)
+    // CORE_SKILL env var can be set to 'WORK' or 'PAI'
+    const coreSkillName = process.env.CORE_SKILL || 'WORK';
+    let skillPath = join(paiDir, `skills/${coreSkillName}/SKILL.md`);
+
+    // If WORK doesn't exist, fallback to PAI
+    if (!existsSync(skillPath)) {
+      console.error(`⚠️  ${coreSkillName} skill not found, trying PAI...`);
+      skillPath = join(paiDir, 'skills/PAI/SKILL.md');
+    }
+
+    // Verify skill file exists
+    if (!existsSync(skillPath)) {
+      console.error(`❌ Core identity skill not found at: ${skillPath}`);
+      console.error(`💡 Create your WORK or PAI skill file or check PAI_DIR/CORE_SKILL environment variables`);
       process.exit(1);
     }
 
-    console.error('📚 Reading PAI core context from skill file...');
+    console.error(`📚 Reading ${coreSkillName} core context from skill file...`);
 
-    // Read the PAI SKILL.md file content
-    const paiContent = readFileSync(paiSkillPath, 'utf-8');
+    // Read the skill SKILL.md file content
+    const skillContent = readFileSync(skillPath, 'utf-8');
 
-    console.error(`✅ Read ${paiContent.length} characters from PAI SKILL.md`);
+    console.error(`✅ Read ${skillContent.length} characters from ${coreSkillName} SKILL.md`);
 
-    // Output the PAI content as a system-reminder
+    // Output the skill content as a system-reminder
     // This will be injected into Claude's context at session start
     const message = `<system-reminder>
-PAI CORE CONTEXT (Auto-loaded at Session Start)
+CORE IDENTITY CONTEXT (Auto-loaded at Session Start)
 
-The following context has been loaded from ${paiSkillPath}:
+The following context has been loaded from ${skillPath}:
 
 ---
-${paiContent}
+${skillContent}
 ---
 
 This context is now active for this session. Follow all instructions, preferences, and guidelines contained above.
@@ -77,7 +88,7 @@ This context is now active for this session. Follow all instructions, preference
     // Write to stdout (will be captured by Claude Code)
     console.log(message);
 
-    console.error('✅ PAI context injected into session');
+    console.error(`✅ ${coreSkillName} context injected into session`);
     process.exit(0);
   } catch (error) {
     console.error('❌ Error in load-core-context hook:', error);

@@ -2,33 +2,15 @@
   "mcpServers": {
     "httpx": {
       "type": "http",
-      "description": "Use for getting information on web servers or site stack information, like what tech stack a given website is running, and other similar use cases.",
+      "description": "Get information on web servers and site stack information - what tech stack a website is running. Useful for reconnaissance and technology detection during security assessments.",
       "url": "https://httpx-mcp.danielmiessler.workers.dev",
       "headers": {
         "x-api-key": "REDACTED"
       }
     },
-    "content": {
-      "type": "http",
-      "description": "Figuring out any of my (Daniel Miessler's) opinions or blog posts or writing online. This is basically an archive of all my content.",
-      "url": "https://content-mcp.danielmiessler.workers.dev"
-    },
-    "daemon": {
-      "type": "http",
-      "description": "My personal API for everything in my (Daniel Miessler's) life.",
-      "url": "https://mcp.daemon.danielmiessler.com"
-    },
-    "Foundry": {
-      "type": "http",
-      "description": "My personal AI infrastructure (PAI), which is where you should look for any tool where I ask you to do a task that you're not sure how to do. Start by checking here to see if there's a tool for it.",
-      "url": "https://api.danielmiessler.com/mcp/",
-      "headers": {
-        "Authorization": "REDACTED"
-      }
-    },
     "naabu": {
       "type": "http",
-      "description": "This is a port scanner for finding open ports or services on hosts.",
+      "description": "Port scanner for finding open ports and services on hosts during security assessments and reconnaissance.",
       "url": "https://naabu-mcp.danielmiessler.workers.dev",
       "headers": {
         "x-api-key": "REDACTED"
@@ -42,23 +24,15 @@
       ],
       "env": {
         "API_TOKEN": "REDACTED"
-      }
-    },
-    "stripe": {
-      "command": "bunx",
-      "args": [
-        "-y",
-        "@stripe/mcp",
-        "--tools=all"
-      ],
-      "description": "Stripe payment processing and financial operations"
+      },
+      "description": "Web scraping and data collection for OSINT and reconnaissance during security assessments."
     },
     "Ref": {
       "command": "bunx",
       "args": [
         "@refdotai/mcp"
       ],
-      "description": "Documentation search and reading from public sources and private repositories"
+      "description": "Documentation search and reference for 100+ frameworks and libraries. Essential for development and understanding target technologies."
     },
     "apify": {
       "command": "bunx",
@@ -68,7 +42,7 @@
       "env": {
         "APIFY_TOKEN": "REDACTED"
       },
-      "description": "Web scraping and automation tools via Apify platform"
+      "description": "Web scraping and automation tools via Apify platform for OSINT gathering and reconnaissance automation."
     },
     "playwright": {
       "command": "bunx",
@@ -76,7 +50,7 @@
         "@playwright/mcp@latest",
         "--extension"
       ],
-      "description": "Browser automation and testing using Playwright for visual debugging and web interaction"
+      "description": "Browser automation and testing using Playwright for web application security testing, visual debugging, and automated vulnerability validation."
     }
   }
 }
